@@ -3,7 +3,7 @@ require_relative '../integration_test_helper'
 
 class TransactionRenderingTest < ActionDispatch::IntegrationTest
 
-  context "a transaction with expectations but no 'before you start' and 'other ways to apply'" do
+  context "a transaction with need_to_know but no 'before you start' and 'other ways to apply'" do
     should "render the main information" do
       setup_api_responses('register-to-vote')
       visit "/register-to-vote"
@@ -18,10 +18,13 @@ class TransactionRenderingTest < ActionDispatch::IntegrationTest
       within '#content' do
         within 'header' do
           assert page.has_content?("Register to vote")
-          assert page.has_link?("Not what you're looking for? ↓", :href => "#related")
         end
 
         within '.article-container' do
+          within '.beta-label' do
+            assert page.has_link?("find out what this means", :href => "/help/beta")
+          end
+
           within 'section.intro' do
             assert page.has_selector?("p", :text => "You have to fill out the form online, print it off and send it to your local electoral registration office.")
 
@@ -37,8 +40,8 @@ class TransactionRenderingTest < ActionDispatch::IntegrationTest
 
             assert page.has_selector?('h1', :text => "What you need to know")
 
-            expectations = page.all('#what-you-need-to-know li').map(&:text)
-            assert_equal ['Takes around 10 minutes', 'Includes offline steps'], expectations
+            need_to_know = page.all('#what-you-need-to-know li').map(&:text)
+            assert_equal ['Includes offline steps'], need_to_know
           end
 
           assert page.has_selector?(".modified-date", :text => "Last updated: 22 October 2012")
@@ -63,7 +66,6 @@ class TransactionRenderingTest < ActionDispatch::IntegrationTest
       within '#content' do
         within 'header' do
           assert page.has_content?("Register to vote")
-          assert page.has_link?("Ddim beth rydych chi’n chwilio amdano? ↓", :href => "#related")
         end
 
         within '.article-container' do
@@ -75,8 +77,8 @@ class TransactionRenderingTest < ActionDispatch::IntegrationTest
           within 'section.more' do
             assert page.has_selector?('h1', :text => "Yr hyn mae angen i chi ei wybod")
 
-            expectations = page.all('#what-you-need-to-know li').map(&:text)
-            assert_equal ["Mae’n cymryd tua 10 munud", 'Includes offline steps'], expectations
+            need_to_know = page.all('#what-you-need-to-know li').map(&:text)
+            assert_equal ['Includes offline steps'], need_to_know
           end
 
           assert page.has_selector?(".modified-date", :text => "Diweddarwyd diwethaf: 22 Hydref 2012")
@@ -112,8 +114,8 @@ class TransactionRenderingTest < ActionDispatch::IntegrationTest
           within '#what-you-need-to-know' do
             assert page.has_no_selector?('h1')
 
-            expectations = page.all('li').map(&:text)
-            assert_equal ['Proof of identification required', '3 years of address details required', 'Debit or credit card required'], expectations
+            need_to_know = page.all('li').map(&:text)
+            assert_equal ['Proof of identification required', '3 years of address details required', 'Debit or credit card required'], need_to_know
           end
 
           within '#other-ways-to-apply' do
@@ -223,7 +225,6 @@ class TransactionRenderingTest < ActionDispatch::IntegrationTest
       within '#content' do
         within 'header' do
           assert page.has_content?("Find a job with Universal Jobmatch")
-          assert page.has_link?("Not what you're looking for? ↓", :href => "#related")
         end
 
         within '.article-container' do
@@ -281,7 +282,6 @@ class TransactionRenderingTest < ActionDispatch::IntegrationTest
       within '#content' do
         within 'header' do
           assert page.has_content?("Find a job with Universal Jobmatch")
-          assert page.has_link?("Ddim beth rydych chi’n chwilio amdano? ↓", :href => "#related")
         end
 
         within '.article-container' do
@@ -306,6 +306,78 @@ class TransactionRenderingTest < ActionDispatch::IntegrationTest
           assert page.has_selector?(".modified-date", :text => "Diweddarwyd diwethaf: 20 Tachwedd 2012")
         end
       end # within #content
+    end
+  end
+
+  context "exceptional vehicle-tax start page format" do
+    should "render a bespoke view" do
+      setup_api_responses('vehicle-tax')
+      visit "/vehicle-tax"
+      assert_equal 200, page.status_code
+      within("div.title h1") do
+        assert page.has_content?("Renew a tax disc")
+      end
+      within(".primary-apply") do
+        assert page.has_content?("Apply using the new service")
+      end
+    end
+  end
+  context "exceptional view-driving-licence start page format" do
+    should "render a bespoke view" do
+      setup_api_responses('view-driving-licence')
+      visit "/view-driving-licence"
+      assert_equal 200, page.status_code
+      within("div.title h1") do
+        assert page.has_content?("View your driving licence information")
+      end
+      within(".primary-apply") do
+        assert page.has_content?("You'll need")
+      end
+    end
+  end
+  context "exceptional check-vehicle-tax start page format" do
+    should "render a bespoke view" do
+      setup_api_responses('check-vehicle-tax')
+      visit "/check-vehicle-tax"
+      assert_equal 200, page.status_code
+      within("div.title h1") do
+        assert page.has_content?("Check if a vehicle is taxed")
+      end
+      within(".primary-apply") do
+        assert page.has_content?("Check using the new service")
+      end
+    end
+  end
+
+  context "start page which should have cross domain analytics" do
+    should "include cross domain analytics javascript" do
+      setup_api_responses('register-to-vote')
+      visit "/register-to-vote"
+
+      assert_equal 200, page.status_code
+      assert page.has_selector?("#transaction_cross_domain_analytics", :visible => :all)
+    end
+  end
+
+  context "start page format which shouldn't have cross domain analytics" do
+    should "not include cross domain analytics javascript" do
+      setup_api_responses('check-vehicle-tax')
+      visit "/check-vehicle-tax"
+
+      assert_equal 200, page.status_code
+      assert page.has_no_selector?("#transaction_cross_domain_analytics", :visible => :all)
+    end
+  end
+
+  context "when downtime is scheduled" do
+    should "display downtime message in callout" do
+      setup_api_responses('register-to-vote')
+      visit "/register-to-vote"
+
+      assert_equal 200, page.status_code
+      within('.help-notice') do
+        assert page.has_content?("This service will be unavailable between 3pm on 10 October and 6pm on 11 October")
+      end
     end
   end
 end

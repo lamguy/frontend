@@ -1,5 +1,94 @@
 class GovernmentResult < SearchResult
-  result_accessor :public_timestamp, :display_type, :indexable_content
+  include ERB::Util
+  result_accessor :display_type
+
+  def to_hash
+    super.merge({
+      metadata: metadata,
+      metadata_any?: metadata.any?,
+      sections: sections,
+      sections_present?: sections.present?,
+      government: true
+    })
+  end
+
+  def metadata
+    out = []
+    out << public_timestamp if public_timestamp.present?
+    if display_type.present?
+      out << display_type
+    elsif %w{ corporate_information document_series }.include?(format)
+      out << format.humanize
+    end
+    out << organisations if organisations.present?
+    out << world_locations if world_locations.present?
+    out
+  end
+
+  def sections
+    case format
+    when 'minister' then
+      [
+        { hash: 'responsibilities', title: 'Responsibilities' },
+        { hash: 'current-role-holder', title: 'Current role holder' },
+      ]
+    when 'person' then
+      [
+        { hash: 'biography', title: 'Biography' },
+        { hash: 'current-roles', title: 'Roles' },
+      ]
+    when 'world_location' then
+      [
+        { hash: 'worldwide-priorities', title: 'Priorities' },
+        { hash: 'organisations', title: "Organisations in #{title}" },
+      ]
+    when 'worldwide_organisation' then
+      [
+        { hash: 'our-services', title: 'Services' },
+        { hash: 'contact-us', title: 'Contact details' },
+      ]
+    end
+  end
+
+  def title
+    if format == 'organisation' && result["organisation_state"] == 'closed'
+      "Closed organisation: " + result["title"]
+    else
+      result["title"]
+    end
+  end
+
+  def public_timestamp
+    result["public_timestamp"].to_date.strftime("%e %B %Y") if result["public_timestamp"]
+  end
+
+  def description
+    description = nil
+    if result["description"].present?
+      description = result["description"]
+    end
+
+    description = description.truncate(215, :separator => " ") if description
+
+    if format == "organisation" && result["organisation_state"] != 'closed'
+      "The home of #{result["title"]} on GOV.UK. #{description}"
+    else
+      description
+    end
+  end
+
+private
+
+  def world_locations
+    locations = fetch_multi_valued_field("world_locations")
+    if locations.length > 1
+      "multiple locations"
+    elsif locations.length == 1
+      locations.map do |field|
+        field["acronym"] || field["title"] || field["slug"]
+      end.join(", ")
+    end
+  end
 
   def fetch_multi_valued_field(field_name)
     if result[field_name].present?
@@ -9,77 +98,13 @@ class GovernmentResult < SearchResult
     end
   end
 
-  def display_links?
-    ! %w{
-      /government/organisations/deputy-prime-ministers-office
-      /government/organisations/prime-ministers-office-10-downing-street}.include?(self.link)
-  end
-
   def organisations
-    fetch_multi_valued_field("organisations")
-  end
-
-  def has_organisations?
-    organisations.any?
-  end
-
-  def topics
-    fetch_multi_valued_field("topics")
-  end
-
-  def has_topics?
-    topics.any?
-  end
-
-  def world_locations
-    fetch_multi_valued_field("world_locations")
-  end
-
-  def has_world_locations?
-    world_locations.any?
-  end
-
-  def document_series
-    fetch_multi_valued_field("document_series")
-  end
-
-  def has_document_series?
-    document_series.any?
-  end
-
-  def display_timestamp
-    self.public_timestamp.to_date.strftime("%e %B %Y")
-  end
-
-  def display(multi_valued_field)
-    multi_valued_field.map do |field|
-      field["acronym"] || field["title"] || field["slug"]
+    fetch_multi_valued_field("organisations").map do |organisation|
+      if organisation["acronym"] && (organisation["acronym"] != organisation["title"])
+        "<abbr title='#{h(organisation["title"])}'>#{h(organisation["acronym"])}</abbr>"
+      else
+        organisation["title"] || organisation["slug"]
+      end
     end.join(", ")
-  end
-
-  def display_topics
-    display(topics)
-  end
-
-  def display_world_locations
-    if world_locations.length > 1
-      "multiple locations"
-    else
-      display(world_locations)
-    end
-  end
-
-  def display_document_series
-    display(document_series)
-  end
-
-  def display_a_description
-    if self.description.present?
-      self.description.truncate(215, :separator => " ")
-    elsif self.indexable_content.present?
-      self.indexable_content.truncate(215, :separator => " ")
-    else
-      nil
-    end
   end
 end

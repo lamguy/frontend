@@ -1,18 +1,11 @@
+require 'frontend'
+
 Frontend::Application.routes.draw do
   get "/homepage" => redirect("/")
-  get "/search.json" => redirect { |params,req| "/api/search.json?q=#{CGI.escape(req.query_parameters['q'] || '')}" }
+
   get "/search" => "search#index", as: :search
   post "/search" => proc { [405, {}, ["Method Not Allowed"]] } # Prevent non-GET requests for /search blowing up in the publication handlers below
   get "/search/opensearch" => "search#opensearch"
-  get "/browse.json" => redirect("/api/tags.json?type=section&root_sections=true")
-  get "/browse" => "browse#index", to: "browse#index"
-  get "/browse/:section.json" => redirect("/api/tags.json?type=section&parent_id=%{section}")
-  get "/browse/:section", as: "browse", to: "browse#section"
-  get "/browse/:section/:sub_section.json" => redirect("/api/with_tag.json?tag=%{section}%%2F%{sub_section}")
-  get "/browse/:section/:sub_section", as: "browse", to: "browse#sub_section"
-
-  # new business browse page
-  get "/business" => "browse#section", :section => "business"
 
   # Crude way of handling the situation described at
   # http://stackoverflow.com/a/3443678
@@ -46,6 +39,10 @@ Frontend::Application.routes.draw do
   end
 
   get ":slug/y(/*responses)" => "simple_smart_answers#flow", :as => :smart_answer_flow
+
+  if ENABLE_CONTENT_STORE_TEST_ENDPOINT
+    get "test-for-content-store/*path" => "content_store#content_store_test"
+  end
 
   with_options(as: "publication", to: "root#publication") do |pub|
     pub.get "*slug", slug: %r{(done|help)/.+}

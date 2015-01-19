@@ -27,7 +27,7 @@ var GOVUK_test = {
   }
 };
 
-GOVUK_test.countryFilter.categories = { 
+GOVUK_test.countryFilter.categories = {
   allWithCountries: '<section class="countries-wrapper">' + GOVUK_test.countryFilter.threeCategories + '</section>',
   twoWithoutCountries: '<section><div id="W" class="list">' +
     '<h2>' +
@@ -83,7 +83,7 @@ describe("CountryFilter", function () {
           createAFilterWithParam = function () {
             filter = new GOVUK.countryFilter($input);
           };
-    
+
       expect(createAFilterNoParam).toThrow();
       expect(createAFilterWithParam).not.toThrow();
     });
@@ -99,7 +99,7 @@ describe("CountryFilter", function () {
 
     it("Should have the correct properties applied to it", function () {
       filter = new GOVUK.countryFilter($input);
-      
+
       expect(filter.container).toBeDefined();
     });
 
@@ -137,8 +137,34 @@ describe("CountryFilter", function () {
       expect(validEventMock.preventDefault).toHaveBeenCalled();
     });
 
+    it("Should track search input via timeouts", function () {
+
+      runs(function() {
+        window._gaq = window._gaq || { push : function(args) {} };
+
+        filter = new GOVUK.countryFilter($input);
+
+        expect(filter._trackTimeout).toBeFalsy();
+
+        spyOn(filter, "filterListItems");
+        spyOn(filter, "track");
+        spyOn(window._gaq, "push");
+
+        $input.keyup();
+
+        expect(filter.track).toHaveBeenCalled();
+      });
+
+      waits(1001);
+
+      runs(function() {
+        expect(window._gaq.push).toHaveBeenCalled();
+      });
+
+    });
+
     it("Should set aria attributes on div.countries-wrapper", function () {
-      var $container = $("<div class='inner' />"),
+      var $container = $("<div class='travel-container' />"),
           $countriesWrapper = $("<div class='countries-wrapper' />");
 
       $container
@@ -153,9 +179,9 @@ describe("CountryFilter", function () {
       var $temp = $;
 
       $.fn.bind = jasmine.createSpy('bindSpy');
-      
+
       filter = new GOVUK.countryFilter($input);
-      
+
       expect($.fn.bind).toHaveBeenCalledWith("countrieslist", filter.updateCounter);
       $.fn.bind = $temp.fn.bind;
     });
@@ -176,16 +202,16 @@ describe("CountryFilter", function () {
       expect($headings.map(function () { if ($(this).css('display') !== 'none') { return this; }}).length).toEqual(3);
     });
 
-    it("Should make headings with their countries hidden invisible", function () {
+    it("Should make headings with no visible countries invisible by hiding the wrapper", function () {
       var $headings;
 
       $countries = $(GOVUK_test.countryFilter.categories.twoWithoutCountries);
       filter = new GOVUK.countryFilter($input);
       filter.container = $countries;
       $headings = $countries.find('h2');
-      
+
       filter.filterHeadings($headings);
-      expect($headings.map(function () { if ($(this).css('display') !== 'none') { return this; }}).length).toEqual(1);
+      expect($headings.map(function () { if ($(this).parent().css('display') !== 'none') { return this; }}).length).toEqual(1);
     });
   });
 
@@ -222,14 +248,14 @@ describe("CountryFilter", function () {
     var $counter;
 
     beforeEach(function () {
-      $container = $('<div class="inner">' + GOVUK_test.countryFilter.countryCounter + '</div>').append($input);
+      $container = $('<div class="travel-container">' + GOVUK_test.countryFilter.countryCounter + '</div>').append($input);
       filter = new GOVUK.countryFilter($input);
       $counter = $(".country-count", filter.container)
     });
 
     it("Should make the counter text match the sent number", function () {
       filter.updateCounter({}, { 'count': 27 });
-      
+
       expect($counter.find('.js-filter-count').text()).toBe('27');
     });
 
@@ -256,7 +282,7 @@ describe("CountryFilter", function () {
     beforeEach(function () {
       $countries = $(GOVUK_test.countryFilter.categories.allWithCountries);
       $counter = $(GOVUK_test.countryFilter.countryCounter);
-      $container = $('<div class="inner"></div>')
+      $container = $('<div class="travel-container"></div>')
         .append($input)
         .append($countries)
         .append($counter);

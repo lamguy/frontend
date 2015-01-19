@@ -25,14 +25,16 @@ class SimpleSmartAnswersTest < ActionDispatch::IntegrationTest
     within '#content' do
       within 'header.page-header' do
         assert_page_has_content("The Bridge of Death")
-        assert page.has_link?("Not what you're looking for? ↓", :href => "#related")
       end
 
       within '.article-container' do
         within '.intro' do
           assert_page_has_content("He who would cross the Bridge of Death Must answer me These questions three Ere the other side he see.")
-
           assert page.has_link?("Start now", :href => "/the-bridge-of-death/y")
+        end
+
+        within '.beta-label' do
+          assert page.has_link?("find out what this means", :href => "/help/beta")
         end
 
         within(".modified-date") { assert_page_has_content "Last updated: 25 June 2013" }

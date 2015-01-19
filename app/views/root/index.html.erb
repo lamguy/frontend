@@ -1,12 +1,12 @@
 <% content_for :extra_headers do %>
 <link rel="canonical" href="<%= root_path %>" />
-<meta name="description" content="GOV.UK - The new place to find government services and information replacing Directgov and Business Link - Simpler, clearer, faster" />
+<meta name="description" content="GOV.UK - The place to find government services and information - Simpler, clearer, faster" />
 <% end %>
 <% content_for :title, "Welcome to GOV.UK" %>
 <% content_for :body_classes, "homepage" %>
 
 <%= render :partial => "campaign_notification" %>
-<main id="content" class="root-index" role="main" tabindex="-1">
+<main id="content" class="root-index" role="main">
   <header class="homepage-top">
     <div class="homepage-top-inner">
 
@@ -28,11 +28,13 @@
           </div>
           <div class="content-links">
             <div class="floated-inner-block content-links-inner">
-              <h2>Contents</h2>
+              <h2>Popular on GOV.UK</h2>
               <ul>
-                <li><a href="#services-and-information">Services and information</a></li>
-                <li><a href="#departments-and-policy">Departments and policy</a></li>
-                <li><a href="#more-on-govuk">More on GOV.UK</a></li>
+                <li><a href="/jobsearch">Universal Jobmatch job search</a></li>
+                <li><a href="/vehicle-tax">Renew vehicle tax (tax disc)</a></li>
+                <li><a href="/student-finance-register-login">Log in to student finance</a></li>
+                <li><a href="/book-theory-test">Book your theory test</a></li>
+                <li><a href="/employment-support-allowance">Employment and Support Allowance</a></li>
               </ul>
             </div>
           </div>
@@ -46,70 +48,77 @@
 
       <section class="services-block" aria-labelledby="services-and-information-label" id="services-and-information">
         <div class="inner-block floated-children">
-          <div class="replaces">
-            <p>This website replaces</p>
-            <ul>
-              <li><%= image_tag 'homepage/directgov-logo-2x.png', :alt => 'Directgov', :width => '105', :height => '20' %></li>
-              <li><%= image_tag 'homepage/businesslink-logo-2x.png', :alt => 'Businesslink', :width => '75', :height => '30' %></li>
-            </ul>
-          </div>
           <div class="two-column-heading">
             <h2 id="services-and-information-label">Services and information</h2>
           </div>
-          <ul class="categories-list">
-            <li>
-              <h2><a href="/browse/driving">Driving and transport</a></h2>
-              <p>Includes car tax, MOT and driving licences</p>
-            </li>
-            <li>
-              <h2><a href="/browse/benefits">Benefits</a></h2>
-              <p>Includes tax credits, eligibility and appeals</p>
-            </li>
-            <li>
-              <h2><a href="/browse/business">Business and self-employed</a></h2>
-              <p>Tools and guidance for businesses</p>
-            </li>
-            <li class="nth-child">
-              <h2><a href="/browse/employing-people">Employing people</a></h2>
-              <p>Includes pay, contracts and hiring</p>
-            </li>
-            <li>
-              <h2><a href="/browse/abroad">Passports, travel and living abroad</a></h2>
-              <p>Includes renewing passports and travel advice by country</p>
-            </li>
-            <li>
-              <h2><a href="/browse/education">Education and learning</a></h2>
-              <p>Includes student loans and admissions</p>
-            </li>
-            <li class="nth-child">
-              <h2><a href="/browse/working">Working, jobs and pensions</a></h2>
-              <p>Includes holidays and finding a job</p>
-            </li>
-            <li>
-              <h2><a href="/browse/housing">Housing and local services</a></h2>
-              <p>Owning or renting and council services</p>
-            </li>
-            <li>
-              <h2><a href="/browse/justice">Crime, justice and the law</a></h2>
-              <p>Legal processes, courts and the police</p>
-            </li>
-            <li class="nth-child">
-              <h2><a href="/browse/tax">Money and tax</a></h2>
-              <p>Includes debt and Self Assessment</p>
-            </li>
-            <li>
-              <h2><a href="/browse/births-deaths-marriages">Births, deaths, marriages and care</a></h2>
-              <p>Parenting, civil partnerships, divorce and Lasting Power of Attorney</p>
-            </li>
-            <li>
-              <h2><a href="/browse/disabilities">Disabled people</a></h2>
-              <p>Includes carers, your rights, benefits and the Equality Act</p>
-            </li>
-            <li class="nth-child">
-              <h2><a href="/browse/citizenship">Citizenship and living in the UK</a></h2>
-              <p>Voting, community participation, life in the UK, international projects</p>
-            </li>
-          </ul>
+          <div class="categories-lists">
+            <ol class="categories-list">
+              <li>
+                <h3><a href="/browse/benefits">Benefits</a></h3>
+                <p>Includes tax credits, eligibility and appeals</p>
+              </li>
+              <li>
+                <h3><a href="/browse/births-deaths-marriages">Births, deaths, marriages and care</a></h3>
+                <p>Parenting, civil partnerships, divorce and Lasting Power of Attorney</p>
+              </li>
+              <li>
+                <h3><a href="/browse/business">Business and self-employed</a></h3>
+                <p>Tools and guidance for businesses</p>
+              </li>
+              <li>
+                <h3><a href="/browse/citizenship">Citizenship and living in the UK</a></h3>
+                <p>Voting, community participation, life in the UK, international projects</p>
+              </li>
+              <li>
+                <h3><a href="/browse/justice">Crime, justice and the law</a></h3>
+                <p>Legal processes, courts and the police</p>
+              </li>
+            </ol>
+            <ol class="categories-list">
+              <li>
+                <h3><a href="/browse/disabilities">Disabled people</a></h3>
+                <p>Includes carers, your rights, benefits and the Equality Act</p>
+              </li>
+              <li>
+                <h3><a href="/browse/driving">Driving and transport</a></h3>
+                <p>Includes vehicle tax, MOT and driving licences</p>
+              </li>
+              <li>
+                <h3><a href="/browse/education">Education and learning</a></h3>
+                <p>Includes student loans and admissions</p>
+              </li>
+              <li>
+                <h3><a href="/browse/employing-people">Employing people</a></h3>
+                <p>Includes pay, contracts and hiring</p>
+              </li>
+              <li>
+                <h3><a href="/browse/environment-countryside">Environment and countryside</a></h3>
+                <p>Includes flooding, recycling and wildlife</p>
+              </li>
+            </ol>
+            <ol class="categories-list">
+              <li>
+                <h3><a href="/browse/housing-local-services">Housing and local services</a></h3>
+                <p>Owning or renting and council services</p>
+              </li>
+              <li>
+                <h3><a href="/browse/tax">Money and tax</a></h3>
+                <p>Includes debt and Self Assessment</p>
+              </li>
+              <li>
+                <h3><a href="/browse/abroad">Passports, travel and living abroad</a></h3>
+                <p>Includes renewing passports and travel advice by country</p>
+              </li>
+              <li>
+                <h3><a href="/visas-immigration">Visas and immigration</a></h3>
+                <p>Visas, asylum and sponsorship</p>
+              </li>
+              <li>
+                <h3><a href="/browse/working">Working, jobs and pensions</a></h3>
+                <p>Includes holidays and finding a job</p>
+              </li>
+            </ol>
+          </div>
         </div>
       </section>
 
@@ -117,8 +126,12 @@
 
       <section class="departments-and-policy" aria-labelledby="departments-and-policy-label">
         <div class="inner-block floated-children">
-          <div class="single-column-heading">
-            <h2 id="departments-and-policy-label">Departments and&nbsp;policy</h2>
+            <h2 id="departments-and-policy-label" class="visuallyhidden">Departments and&nbsp;policy</h2>
+          <div class="large-numbers">
+            <ol>
+              <li><a href="/government/organisations"><strong>24</strong> Ministerial departments</a></li>
+              <li><a href="/government/organisations"><strong>331</strong> Other agencies and public&nbsp;bodies</a></li>
+            </ol>
           </div>
           <div class="departments-intro">
             <div class="floated-inner-block">
@@ -128,7 +141,7 @@
                 being merged into GOV.UK.
               </p>
               <p>
-                Here you can see all their <a href="/government/policies">policies</a>,
+                Here you can see all <a href="/government/policies">policies</a>,
                 <a href="/government/announcements">announcements</a>,
                 <a href="/government/publications">publications</a>,
                 <a href="/government/publications?publication_filter_option=statistics">statistics</a>
@@ -136,51 +149,33 @@
               </p>
             </div>
           </div>
-          <div class="large-numbers">
-            <ol>
-              <li><a href="/government/organisations"><strong>24</strong> Ministerial departments</a></li>
-              <li><a href="/government/organisations"><strong>331</strong> Other agencies and public&nbsp;bodies</a></li>
-              <li><a href="/government/topics"><strong>47</strong> Topics</a></li>
-              <li><a href="/government/policies"><strong>223</strong> Policies</a></li>
-            </ol>
-          </div>
 
           <div class="departments-promo-sections">
             <article class="promo-image">
               <div class="promo-content">
-                <a href="/government/how-government-works"><%= image_tag 'homepage/cabinet-office.jpg', alt: 'How government works' %></a>
-                <h3 id="how-government-works-label">How government works</h3>
+                <a href="/government/news/vehicle-tax-changes"><%= image_tag 'homepage/vehicle-tax.jpg', alt: 'Changes to vehicle tax' %></a>
+                <h3>Changes to vehicle tax</h3>
                 <p>
-                  In the UK, the Prime Minister leads the government with the
-                  support of the cabinet and ministers. You can find out who runs
-                  government and how government is run, as well as learning about
-                  the history of government.
+                  From 1 October 2014, <a href="/government/news/vehicle-tax-changes">you won’t need a paper tax disc</a> and you’ll be able to pay by direct debit.
                 </p>
-                <p><a href="/government/how-government-works" aria-describedby="how-government-works-label">Read more</a></p>
               </div>
             </article>
             <article class="promo-image">
               <div class="promo-content">
-                <a href="/government/get-involved"><%= image_tag 'homepage/library-girl.jpg', alt: 'Get involved' %></a>
-                <h3 id="get-involved-label">Get involved</h3>
+                <a href="https://www.blog.gov.uk"><%= image_tag 'homepage/govuk-blogs.jpg', alt: 'GOV.UK blogs' %></a>
+                <h3>GOV.UK blogs</h3>
                 <p>
-                  Find out how you can engage with government directly, and take
-                  part locally, nationally or internationally. You can also read
-                  policies about how government is increasing participation.
+                  <a href="https://www.blog.gov.uk">Search the list</a> of GOV.UK blogs, and find one to match your interest.
                 </p>
-                <p><a href="/government/get-involved" aria-describedby="get-involved-label">Find out more</a></p>
               </div>
             </article>
             <article class="promo-image">
               <div class="promo-content">
-                <a href="/government/world"><%= image_tag 'homepage/worldwide.jpg', alt: 'Worldwide' %></a>
-                <h3 id="worldwide-label">Worldwide</h3>
+                <a href="/warmthiswinter"><%= image_tag 'homepage/winter-warmer.jpg', alt: 'Keep warm this winter' %></a>
+                <h3>Keep warm this winter</h3>
                 <p>
-                  Find out what the UK government is doing in over 200 world
-                  locations. You can read the priorities for each location and
-                  get embassy information and contact details.
+                  Find out how to <a href="/warmthiswinter">save energy and keep warm this winter</a>.
                 </p>
-                <p><a href="/government/world" aria-describedby="worldwide-label">See all locations</a></p>
               </div>
             </article>
           </div>
@@ -205,18 +200,20 @@
                 <li><a href="/council-tax-bands">Council Tax bands</a></li>
                 <li><a href="/running-a-limited-company">Running a limited company</a></li>
                 <li><a href="/book-a-driving-theory-test">Driving theory test</a></li>
-                <li><a href="/calculate-vehicle-tax-rates">Car tax rates</a></li>
-                <li><a href="/tax-disc">Get a car tax disc</a></li>
+                <li><a href="/calculate-vehicle-tax-rates">Vehicle tax rates</a></li>
+                <li><a href="/vehicle-tax">Renew vehicle tax (tax disc)</a></li>
                 <li><a href="/vat-rates">VAT rates</a></li>
               </ul>
             </div>
           </div>
-          <article class="promo-image" id='promo'>
+          <article class="promo-image" id="promo">
             <div class="promo-content">
-              <a href="http://think.direct.gov.uk"><%= image_tag 'homepage/think-campaign-image.jpg', :alt => "Think!" %></a>
-              <h3 id="promo-label">Think!</h3>
-              <p>Any amount of alcohol affects your ability to drive.</p>
-              <p><a rel="external" href="http://think.direct.gov.uk" aria-describedby="promo-label">Read about the consequences of drink driving</a></p>
+              <h3 class="promo-text-cta">
+                <a href="/log-in-file-self-assessment-tax-return">
+                <span class="main-text">Do your Self Assessment today</span>
+                </a>
+              </h3>
+              <p><a href="/log-in-file-self-assessment-tax-return">Do your tax return</a> and find inner peace.</p>
             </div>
           </article>
         </div>

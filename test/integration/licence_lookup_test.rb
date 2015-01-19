@@ -1,4 +1,4 @@
-require 'integration_test_helper'
+require_relative '../integration_test_helper'
 require 'gds_api/test_helpers/mapit'
 
 class LicenceLookupTest < ActionDispatch::IntegrationTest
@@ -15,6 +15,7 @@ class LicenceLookupTest < ActionDispatch::IntegrationTest
       @artefact = artefact_for_slug('licence-to-kill').merge({
         "title" => "Licence to kill",
         "format" => "licence",
+        "in_beta" => true,
         "details" => {
           "format" => "Licence",
           "licence_overview" => "You only live twice, Mr Bond.\n",
@@ -71,6 +72,7 @@ class LicenceLookupTest < ActionDispatch::IntegrationTest
 
         assert page.has_content? "Licence to kill"
         assert page.has_content? "You only live twice, Mr Bond."
+        assert page.has_link?("find out what this means", :href => "/help/beta")
       end
 
       should "not show a postcode error" do
@@ -184,10 +186,10 @@ class LicenceLookupTest < ActionDispatch::IntegrationTest
       content_api_has_an_artefact("licence-to-kill", artefact)
     end
 
-    should "show message to contact local authority" do
+    should "show message to contact local council" do
       visit '/licence-to-kill'
 
-      assert page.has_content?('contact your local authority')
+      assert page.has_content?('Contact your local council')
     end
   end
 
@@ -350,11 +352,11 @@ class LicenceLookupTest < ActionDispatch::IntegrationTest
       content_api_has_an_artefact_with_snac_code("licence-to-kill", "30UN", artefact)
     end
 
-    should "show message to contact local authority" do
+    should "show message to contact local council" do
       visit '/licence-to-kill/south-ribble'
 
       assert page.status_code == 200
-      assert page.has_content?('contact your local authority')
+      assert page.has_content?('Contact your local council')
     end
   end
 
@@ -408,9 +410,9 @@ class LicenceLookupTest < ActionDispatch::IntegrationTest
       assert page.status_code == 200
     end
 
-    should "show message to contact local authority" do
+    should "show message to contact local council" do
       visit '/licence-to-kill'
-      assert page.has_content?('contact your local authority')
+      assert page.has_content?('Contact your local council')
     end
   end
 

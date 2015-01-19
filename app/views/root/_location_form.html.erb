@@ -6,14 +6,14 @@
         <input type="hidden" name="edition" value="<%= @edition %>">
       <% end %>
 
-      <% if params[:postcode] and @location.nil? %>
-      <div class="location_error error-notification">Please enter a valid full UK postcode.</div>
-      <% elsif @location_error %>
+      <% if @location_error %>
       <div class="location_error error-notification"><%= t @location_error %></div>
+      <% elsif params[:postcode] and @publication.places.nil? %>
+      <div class="location_error error-notification">Please enter a valid full UK postcode.</div>
       <% end %>
 
       <div class="ask_location">
-        <label for="postcode">Enter a UK postcode <input class="postcode" id="postcode" name="postcode" type="text" placeholder="e.g. SW1A 2AA"></label>
+        <label for="postcode">Enter your postcode (UK only) <input class="postcode" id="postcode" name="postcode" type="text" placeholder="eg SW1A 2AA"></label>
         <button type="submit" class="button">Find</button>
       </div>
     </fieldset>

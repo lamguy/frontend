@@ -4,30 +4,31 @@
     <div>
        <h1><%= @publication.title %></h1>
     </div>
-    <a class="skip-to-related" href="#related">Not what you're looking for? ↓</a>
   </header>
-	<div class="article-container group">
-	 	<article role="article" class="group">
-	    <div class="inner">
+  <div class="article-container group">
+    <%= render :partial => 'beta_label' if @publication.in_beta %>
+    <article role="article" class="group">
 
-	      <section class="intro">
-  	      <div class="get-started-intro">
+      <div class="inner">
 
-  	        <div class="find-nearest">
+        <section class="intro">
+          <div class="get-started-intro">
 
-    	        <%= raw @publication.introduction %>
+            <div class="find-nearest">
+
+              <%= raw @publication.introduction %>
 
               <%= render :partial => 'location_form', :locals => {:format => 'service'} %>
             </div>
           </div>
         </section>
 
-        <% if @location.present? %>
+        <% if @postcode.present? and !@publication.places.nil? %>
           <% if @publication.places.any? %>
             <section class="places">
-              <h2>Results near <strong><%= @location.postcode %></strong>:</h2>
+              <h2>Results near <strong><%= @postcode %></strong>:</h2>
               <ol id="options" class="places">
-                <%= mustache_partial '_option.html', { 'options' => @publication.places } %>
+                <%= render :partial => 'option', :locals => { :places => @publication.places } %>
               </ol>
             </section>
           <% else %>
@@ -37,15 +38,7 @@
           <section class="more">
             <div class="further_information">
               <h2>Further information</h2>
-
-              <% if @publication.expectations and @publication.expectations.any? %>
-                <ul class="helpers group">
-                  <% @publication.expectations.each do |e| %>
-                    <li><%= e %></li>
-                  <% end %>
-                </ul>
-              <% end %>
-
+              <%= raw @publication.need_to_know %>
               <%= raw @publication.more_information %>
             </div>
           </section>
@@ -53,11 +46,11 @@
 
       </div>
 
-		</article>
+    </article>
     <%= render 'publication_metadata', :publication => @publication, :api_links => {
       'application/json' => publication_path(@publication.slug, :edition => @edition, :format => :json)
     } %>
-	</div>
+  </div>
 </main>
 
 <div id="related-items"></div>

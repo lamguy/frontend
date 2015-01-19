@@ -1,5 +1,6 @@
 require_relative '../integration_test_helper'
 require 'gds_api/test_helpers/mapit'
+require 'gds_api/test_helpers/imminence'
 
 class PlacesTest < ActionDispatch::IntegrationTest
   include GdsApi::TestHelpers::Mapit
@@ -10,17 +11,17 @@ class PlacesTest < ActionDispatch::IntegrationTest
     @artefact = artefact_for_slug('passport-interview-office').merge({
       "title" => "Find a passport interview office",
       "format" => "place",
+      "in_beta" => true,
       "details" => {
         "description" => "Find a passport interview office",
         "place_type" => "find-passport-offices",
-        "expectations" => [ "Proof of identification required" ],
+        "need_to_know" => "<ul><li>Proof of identification required</li></ul>",
         "introduction" =>  "<p>Enter your postcode to find a passport interview office near you.</p>"
       }
     })
     content_api_has_an_artefact('passport-interview-office', @artefact)
 
-    @artefact_with_places = @artefact.dup
-    @artefact_with_places['details']['places'] = [
+    @places = [
       {
         "access_notes" => "The London Passport Office is fully accessible to wheelchair users. ",
         "address1" => nil,
@@ -67,12 +68,16 @@ class PlacesTest < ActionDispatch::IntegrationTest
       assert page.has_content?("Find a passport interview office")
     end
 
+    within '.beta-label' do
+      assert page.has_link?("find out what this means", :href => "/help/beta")
+    end
+
     within ".intro" do
       assert page.has_content?("Enter your postcode to find a passport interview office near you.")
     end
 
     within ".find-location-for-service" do
-      assert page.has_field?("Enter a UK postcode")
+      assert page.has_field?("Enter your postcode (UK only)")
       assert page.has_button?("Find")
     end
 
@@ -89,11 +94,11 @@ class PlacesTest < ActionDispatch::IntegrationTest
 
   context "given a valid postcode" do
     setup do
-      stub_request(:get, GdsApi::TestHelpers::ContentApi::CONTENT_API_ENDPOINT + "/passport-interview-office.json?latitude=51.5010096&longitude=-0.1415871").
-        to_return(:body => @artefact_with_places.to_json, :status => 200)
+      stub_request(:get, GdsApi::TestHelpers::Imminence::IMMINENCE_API_ENDPOINT + "/places/find-passport-offices.json?limit=5&postcode=SW1A%201AA").
+        to_return(:body => @places.to_json, :status => 200)
 
       visit "/passport-interview-office"
-      fill_in "Enter a UK postcode", :with => "SW1A 1AA"
+      fill_in "Enter your postcode (UK only)", :with => "SW1A 1AA"
       click_on "Find"
     end
 
@@ -127,14 +132,13 @@ class PlacesTest < ActionDispatch::IntegrationTest
 
   context "given a valid postcode with no nearby places" do
     setup do
-      @artefact_with_no_places = @artefact.dup
-      @artefact_with_no_places['details']['places'] = []
+      @places = []
 
-      stub_request(:get, GdsApi::TestHelpers::ContentApi::CONTENT_API_ENDPOINT + "/passport-interview-office.json?latitude=51.5010096&longitude=-0.1415871").
-        to_return(:body => @artefact_with_no_places.to_json, :status => 200)
+      stub_request(:get, GdsApi::TestHelpers::Imminence::IMMINENCE_API_ENDPOINT + "/places/find-passport-offices.json?limit=5&postcode=SW1A%201AA").
+        to_return(:body => @places.to_json, :status => 200)
 
       visit "/passport-interview-office"
-      fill_in "Enter a UK postcode", :with => "SW1A 1AA"
+      fill_in "Enter your postcode (UK only)", :with => "SW1A 1AA"
       click_on "Find"
     end
 
@@ -149,10 +153,11 @@ class PlacesTest < ActionDispatch::IntegrationTest
 
   context "given an invalid postcode" do
     setup do
-      mapit_does_not_have_a_postcode("SW1A 2AA")
+      stub_request(:get, GdsApi::TestHelpers::Imminence::IMMINENCE_API_ENDPOINT + "/places/find-passport-offices.json?limit=5&postcode=SW1A%202AA").
+        to_return(:status => 400)
 
       visit "/passport-interview-office"
-      fill_in "Enter a UK postcode", :with => "SW1A 2AA"
+      fill_in "Enter your postcode (UK only)", :with => "SW1A 2AA"
       click_on "Find"
     end
 
@@ -166,7 +171,7 @@ class PlacesTest < ActionDispatch::IntegrationTest
 
     should "display the postcode form" do
       within ".find-location-for-service" do
-        assert page.has_field?("Enter a UK postcode")
+        assert page.has_field?("Enter your postcode (UK only)")
         assert page.has_button?("Find")
       end
     end

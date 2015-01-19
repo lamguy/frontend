@@ -88,7 +88,6 @@ class RootControllerTest < ActionController::TestCase
       "format" => "guide",
       "details" => {
         "parts" => [],
-        "alternative_title" => "",
         "overview" => ""
       }
     })
@@ -269,6 +268,34 @@ class RootControllerTest < ActionController::TestCase
     get :publication, :slug => "c-slug"
   end
 
+  test "Should not allow framing of transaction pages" do
+    content_api_has_an_artefact("a-slug", {
+      'slug' => 'a-slug',
+      'web_url' => 'https://example.com/a-slug',
+      'format' => 'transaction',
+      'details' => {"need_to_know" => ""},
+      'title' => 'A Test Transaction'
+    })
+
+    prevent_implicit_rendering
+    get :publication, :slug => 'a-slug'
+    assert_equal "DENY", @response.headers["X-Frame-Options"]
+  end
+
+  test "Should not allow framing of local transaction pages" do
+    content_api_has_an_artefact("a-slug", {
+      'slug' => 'a-slug',
+      'web_url' => 'https://example.com/a-slug',
+      'format' => 'local_transaction',
+      'details' => {"need_to_know" => ""},
+      'title' => 'A Test Transaction'
+    })
+
+    prevent_implicit_rendering
+    get :publication, :slug => 'a-slug'
+    assert_equal "DENY", @response.headers["X-Frame-Options"]
+  end
+
   context "setting the locale" do
     should "set the locale to the artefact's locale" do
       artefact = artefact_for_slug('slug')
@@ -359,13 +386,6 @@ class RootControllerTest < ActionController::TestCase
       get :index
       assert_equal "max-age=1800, public",  response.headers["Cache-Control"]
     end
-
-    should "have a slimmer set to load the campaign notification" do
-      get :index
-      assert_include response.headers, Slimmer::Headers::CAMPAIGN_NOTIFICATION
-      assert_equal "true", response.headers[Slimmer::Headers::CAMPAIGN_NOTIFICATION]
-      assert_response :success
-    end
   end
 
   context "loading the tour page" do
@@ -416,7 +436,7 @@ class RootControllerTest < ActionController::TestCase
           'slug' => 'jobs-jobsearch',
           'web_url' => 'https://www.preview.alphagov.co.uk/jobs-jobsearch',
           'format' => 'transaction',
-          'details' => {"expectations" => []},
+          'details' => {"need_to_know" => ""},
           'title' => 'Universal Jobsearch'
         }
         content_api_has_an_artefact("jobs-jobsearch", @details)
@@ -459,7 +479,7 @@ class RootControllerTest < ActionController::TestCase
           'id' => 'https://www.gov.uk/api/jobs-jobsearch-welsh.json',
           'web_url' => 'https://www.preview.alphagov.co.uk/jobs-jobsearch-welsh',
           'format' => 'transaction',
-          'details' => {"expectations" => [], "language" => "cy"},
+          'details' => {"need_to_know" => "", "language" => "cy"},
           'title' => 'Universal Jobsearch'
         }
         content_api_has_an_artefact("jobs-jobsearch-welsh", @details)

@@ -4,10 +4,10 @@
     <div>
       <h1><span>Guide</span> <%= @publication.title %></h1>
     </div>
-    <a class="skip-to-related" href="#related">Not what you're looking for? ↓</a>
   </header>
 
   <div class="article-container group">
+    <%= render :partial => 'beta_label' if @publication.in_beta %>
     <article role="article" class="group">
       <div class="inner">
 
@@ -36,10 +36,3 @@
 </main>
 
 <div id="related-items"></div>
-
-<% content_for :extra_javascript do %>
-  <%= javascript_include_tag 'media-player-loader.js', :defer => 'defer' %>
-<% end %>
-<% content_for :extra_stylesheets do %>
-  <%= stylesheet_link_tag 'media-player.css' %>
-<% end %>

@@ -4,10 +4,11 @@
     <div>
       <h1><%= @publication.title %></h1>
     </div>
-    <a class="skip-to-related" href="#related"><%= t 'common.not_what_youre_looking_for' %> ↓</a>
   </header>
 
   <div class="article-container group">
+    <%= render :partial => 'beta_label' if @publication.in_beta %>
+
     <%= render :partial => "guide_navigation" %>
 
     <article role="article" class="group">

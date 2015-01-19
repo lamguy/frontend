@@ -13,8 +13,9 @@ class LocalTransactionsTest < ActionDispatch::IntegrationTest
     @artefact = artefact_for_slug('pay-bear-tax').merge({
       "title" => "Pay your bear tax",
       "format" => "local_transaction",
+      "in_beta" => true,
       "details" => {
-        "format" => "LocalTrasnaction",
+        "format" => "LocalTransaction",
         "introduction" => "Information about paying local tax on owning or looking after a bear.",
         "local_service" => {
           "description" => "Find out about paying your bear tax",
@@ -64,6 +65,7 @@ class LocalTransactionsTest < ActionDispatch::IntegrationTest
       should "display the page content" do
         assert page.has_content? "Pay your bear tax"
         assert page.has_content? "owning or looking after a bear"
+        assert page.has_content? "This part of GOV.UK is being rebuilt"
       end
 
       should "ask for a postcode" do
@@ -84,11 +86,6 @@ class LocalTransactionsTest < ActionDispatch::IntegrationTest
 
       should "redirect to the appropriate authority slug" do
         assert_equal "/pay-bear-tax/westminster", current_path
-      end
-
-      should "display the authority name" do
-        assert page.has_content?("service is provided by Westminster City Council")
-        assert page.has_link?("Westminster City Council", :href => "http://www.westminster.gov.uk/")
       end
 
       should "show a get started button which links to the interaction" do
@@ -287,6 +284,6 @@ class LocalTransactionsTest < ActionDispatch::IntegrationTest
     click_button('Find')
 
     assert_current_url "/pay-bear-tax"
-    assert page.has_content?("Sorry, we can't find the local authority for your postcode. Try using the local council directory.")
+    assert page.has_content?("Sorry, we can't find the local council for your postcode. Try using the local council directory.")
   end
 end

@@ -1,4 +1,5 @@
 class SearchResult
+  include ActionView::Helpers::NumberHelper
   SCHEME_PATTERN = %r{^https?://}
 
   SECTION_NAME_TRANSLATION = {
@@ -17,7 +18,8 @@ class SearchResult
 
   attr_accessor :result
 
-  def initialize(result)
+  def initialize(search_parameters, result)
+    @search_parameters = search_parameters
     @result = result.stringify_keys!
   end
 
@@ -33,7 +35,7 @@ class SearchResult
     end
   end
 
-  result_accessor :presentation_format, :link, :title, :description, :format, :humanized_format, :es_score
+  result_accessor :link, :title, :format, :es_score
 
   # Avoid the mundanity of creating these all by hand by making
   # dynamic method and accessors.
@@ -50,10 +52,74 @@ class SearchResult
   # External links have a truncated version of their URLs displayed on the
   # results page, but there's little benefit to displaying the URL scheme
   def display_link
-    link.sub(SCHEME_PATTERN, '').truncate(48)
+    link.sub(SCHEME_PATTERN, '').truncate(48) if link
   end
 
-  protected
+  def debug_score
+    @search_parameters.debug_score
+  end
+
+  def to_hash
+    {
+      debug_score: debug_score,
+      title: title,
+      link: link,
+      description: description,
+      examples_present?: result["examples"].present?,
+      examples: result["examples"],
+      suggested_filter_present?: result["suggested_filter"].present?,
+      suggested_filter_title: suggested_filter_title,
+      suggested_filter_link: suggested_filter_link,
+      external: format == "recommended-link",
+      display_link: display_link,
+      section: section,
+      formatted_section_name: (formatted_section_name if section),
+      formatted_subsection_name: (formatted_subsection_name if subsection),
+      formatted_subsubsection_name: (formatted_subsubsection_name if subsubsection),
+      attributes: [],
+      es_score: formatted_es_score,
+      format: format
+    }
+  end
+
+  def description
+    description = result["description"]
+    if description.present?
+      description
+    else
+      case result["format"]
+      when "specialist_sector"
+        "List of information about #{result["title"]}"
+      end
+    end
+  end
+
+protected
+
+  def suggested_filter_title
+    suggested_filter = result["suggested_filter"]
+    if suggested_filter
+      count = suggested_filter["count"]
+      name = suggested_filter["name"]
+      %{All #{count} results in "#{name}"}
+    end
+  end
+
+  def suggested_filter_link
+    suggested_filter = result["suggested_filter"]
+    if suggested_filter
+      field = suggested_filter["field"]
+      value = suggested_filter["value"]
+      external = SearchParameters::external_field_name(field)
+      @search_parameters.build_link(
+        "filter_#{external}" => value
+      )
+    end
+  end
+
+  def formatted_es_score
+    number_with_precision(es_score * 1000, significant: true, precision: 4) if es_score
+  end
 
   def mapped_name(var)
     return SECTION_NAME_TRANSLATION[var] ? SECTION_NAME_TRANSLATION[var] : false

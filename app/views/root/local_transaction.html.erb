@@ -4,9 +4,10 @@
     <div>
       <h1><%= @publication.title %></h1>
     </div>
-    <a class="skip-to-related" href="#related">Not what you're looking for? ↓</a>
   </header>
   <div class="article-container group">
+    <%= render :partial => 'beta_label' if @publication.in_beta %>
+
     <article role="article" class="group">
       <div class="inner">
         <section class="intro">
@@ -20,7 +21,7 @@
         <% if @interaction_details['local_interaction'] %>
 
           <p id="get-started" class="get-started group">
-             <a href="<%= @interaction_details['local_interaction']['url'] %>" rel="external" class="button">
+             <a href="<%= @interaction_details['local_interaction']['url'] %>" rel="external" class="button" role="button">
                Start now
              </a>
              <span class="destination"> on <%= @interaction_details['local_authority']['name'] %></span>
@@ -39,14 +40,7 @@
         <% if @interaction_details['local_authority'] %>
           <% authority = @interaction_details['local_authority'] %>
           <div class="contact vcard">
-            <p>This service is provided by
-              <% if authority['contact_url'].present? %>
-                <a class="url fn org" rel="external" href="<%= authority['contact_url'] %>"><%= authority['name'] %></a>
-              <% else %>
-                <%= authority['name'] %>
-              <% end %>
-              <%= link_to '(change location)', publication_path(@publication.slug) %>
-            </p>
+            <p><%= link_to '(change location)', publication_path(@publication.slug) %></p>
 
             <% unless @interaction_details['local_interaction'] %>
               <% if authority['contact_address'] %>
@@ -61,19 +55,13 @@
 
         <section class="more">
 
-          <% if @publication.expectations.present? %>
+        <% if @publication.need_to_know.present? %>
           <h2>What you need to know</h2>
-
+          <%= raw @publication.need_to_know %>
+        <% end %>
           <div class="more">
-            <ul class="helpers group">
-              <% @publication.expectations.each do |e| %>
-                <li><%= e %></li>
-              <% end %>
-            </ul>
-
             <%= raw @publication.more_information %>
           </div>
-          <% end %>
         </section>
 
       </div>

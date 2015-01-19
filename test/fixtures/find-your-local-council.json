@@ -11,14 +11,12 @@
         "need_id": "2007",
         "description": "Find your local authority in England, Wales, Scotland and Northern Ireland",
         "language": "en",
-        "alternative_title": "",
         "more_information": "\n",
         "introduction": "<p>Find the contact details and website for your local council.</p>\n",
         "will_continue_on": "the local council directory",
         "link": "http://local.direct.gov.uk/LDGRedirect/Start.do?mode=1",
         "alternate_methods": "\n",
-        "minutes_to_complete": "",
-        "expectations": []
+        "need_to_know": ""
     },
     "tags": [
         {

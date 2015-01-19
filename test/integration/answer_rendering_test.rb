@@ -17,13 +17,15 @@ class AnswerRenderingTest < ActionDispatch::IntegrationTest
     within '#content' do
       within 'header' do
         assert page.has_content?("VAT rates")
-        assert page.has_link?("Not what you're looking for? ↓", :href => "#related")
       end
 
       within '.article-container' do
+
         within 'article' do
           assert page.has_selector?(".highlight-answer p em", :text => "20%")
         end
+
+        assert page.has_link?("find out what this means", :href => "/help/beta")
 
         assert page.has_selector?(".modified-date", :text => "Last updated: 2 October 2012")
 
@@ -48,7 +50,6 @@ class AnswerRenderingTest < ActionDispatch::IntegrationTest
     within '#content' do
       within 'header' do
         assert page.has_content?("VAT rates")
-        assert page.has_link?("Ddim beth rydych chi’n chwilio amdano? ↓", :href => "#related")
       end
 
       within '.article-container' do

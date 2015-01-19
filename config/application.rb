@@ -52,12 +52,8 @@ module Frontend
     config.assets.enabled = true
 
     config.assets.precompile += %w(
-      trackers/ab-testing.js
       views/travel-advice.js
-      programmes.js
       frontend.js
-      media-player-loader.js
-      media-player.css
       tour.js
       application.css
       application-ie6.css
@@ -78,7 +74,7 @@ module Frontend
     config.assets.version = '1.0'
 
     # Configure sensitive parameters which will be filtered from the log file.
-    config.filter_parameters += [:password]
+    config.filter_parameters += [:password, :postcode]
 
     # Disable Rack::Cache
     config.action_dispatch.rack_cache = nil

@@ -17,7 +17,6 @@ class GuideRenderingTest < ActionDispatch::IntegrationTest
     within '#content' do
       within 'header.page-header' do
         assert page.has_content?("Data protection")
-        assert page.has_link?("Not what you're looking for? ↓", :href => "#related")
       end
 
       within '.article-container' do
@@ -133,7 +132,6 @@ class GuideRenderingTest < ActionDispatch::IntegrationTest
     within '#content' do
       within 'header.page-header' do
         assert page.has_content?("Data protection")
-        assert page.has_link?("Ddim beth rydych chi’n chwilio amdano? ↓", :href => "#related")
       end
 
       within '.article-container' do
@@ -183,7 +181,7 @@ class GuideRenderingTest < ActionDispatch::IntegrationTest
 
     within "main[role=main]" do
       within first("header h1") do
-        assert page.has_content?("Data protection, a guide from GOV.UK")
+        assert page.has_content?("Data protection")
       end
 
       within "article#the-data-protection-act" do
@@ -216,7 +214,7 @@ class GuideRenderingTest < ActionDispatch::IntegrationTest
 
     within "main[role=main]" do
       within first("header") do
-        within('h1') { assert page.has_content?("Data protection, canllaw gan GOV.UK") }
+        within('h1') { assert page.has_content?("Data protection") }
         assert page.has_content?("Nodiadau")
       end
 
@@ -253,6 +251,11 @@ class GuideRenderingTest < ActionDispatch::IntegrationTest
       end
 
       within '.article-container' do
+        within 'div.beta-label' do
+          assert page.has_link?("find out what this means", :href => "/help/beta")
+        end
+
+
         within 'aside nav' do
           part_titles = page.all('li').map(&:text).map(&:strip)
           assert_equal ['1. The Data Protection Act', '2. Find out what data an organisation has about you', '3. Make a complaint'], part_titles

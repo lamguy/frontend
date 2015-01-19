@@ -1,5 +1,5 @@
 namespace :router do
-  task :router_environment do
+  task :router_environment => :environment do
     require 'plek'
     require 'gds_api/router'
 
@@ -13,9 +13,6 @@ namespace :router do
   task :register_routes => :router_environment do
     routes = [
       %w(/ exact),
-      %w(/browse prefix),
-      %w(/browse.json exact),
-      %w(/business exact),
       %w(/search exact),
       %w(/search.json exact),
       %w(/search/opensearch.xml exact),
@@ -23,6 +20,7 @@ namespace :router do
       %w(/tour exact),
       %w(/ukwelcomes exact),
     ]
+
     routes.each do |path, type|
       @router_api.add_route(path, type, 'frontend', :skip_commit => true)
     end

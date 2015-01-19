@@ -13,11 +13,12 @@
     var enterKeyCode = 13,
         filterInst = this;
 
-    this.container = input.closest('.inner');
+    this.container = input.closest('.travel-container');
     input.keyup(function() {
       var filter = $(this).val();
 
       filterInst.filterListItems(filter);
+      filterInst.track(filter);
     }).keypress(function(event) {
       if (event.which == enterKeyCode) {
         event.preventDefault();
@@ -28,6 +29,7 @@
     $(document).bind("countrieslist", this.updateCounter);
   };
 
+
   CountryFilter.prototype.filterHeadings = function(countryHeadings) {
     var filterInst = this,
         headingHasVisibleCountries = function(headingFirstLetter) {
@@ -36,8 +38,15 @@
         };
 
     countryHeadings.each(function(index, elem) {
-      var $elem = $(elem), header = $elem.text().match(/[A-Z]{1}$/)[0];
-      headingHasVisibleCountries(header) ? $elem.show() : $elem.hide();
+      var $elem = $(elem),
+          header = $elem.text().match(/[A-Z]{1}$/)[0];
+
+      if ( headingHasVisibleCountries(header) ) {
+        $elem.parent().show();
+      }
+      else {
+        $elem.parent().hide();
+      }
     });
   };
 
@@ -60,7 +69,6 @@
         synonymMatch = false,
         filterInst = this;
 
-    this.filterHeadings(countryHeadings);
     listItems.each(function(i, item) {
       var $item = $(item);
       var link = $item.children("a");
@@ -83,11 +91,13 @@
       if(synonymMatch) {
         itemsShowing = listItems.map(function () { if (this.style.display !== 'none') { return this; }}).length;
       }
-      this.filterHeadings(countryHeadings);
     } else {
       countryHeadings.show();
       itemsShowing = listItems.length;
     }
+
+    this.filterHeadings(countryHeadings);
+
     $(document).trigger("countrieslist", { "count" : itemsShowing });
   };
 
@@ -103,9 +113,21 @@
     }
   };
 
+  CountryFilter.prototype._trackTimeout = false;
+
+  CountryFilter.prototype.track = function(search) {
+    clearTimeout(this._trackTimeout);
+    this._trackTimeout = root.setTimeout(function(){
+      var pagePath = window.location.pathname.split('/').pop();
+      if (pagePath) {
+        window._gaq && _gaq.push(['_trackEvent', 'searchBoxFilter', search, pagePath, 0, true]);
+      }
+    }, 1000);
+  };
+
   GOVUK.countryFilter = CountryFilter;
 
-  $("#country-filter form input#country").map(function(idx, input) { 
-      new GOVUK.countryFilter($(input)); 
+  $("#country-filter form input#country").map(function(idx, input) {
+      new GOVUK.countryFilter($(input));
   });
 }).call(this);

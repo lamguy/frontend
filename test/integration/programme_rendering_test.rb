@@ -17,10 +17,13 @@ class ProgrammeRenderingTest < ActionDispatch::IntegrationTest
     within '#content' do
       within 'header.page-header' do
         assert page.has_content?("Reduced Earnings Allowance")
-        assert page.has_link?("Not what you're looking for? ↓", :href => "#related")
       end
 
       within '.article-container' do
+        within 'div.beta-label' do
+          assert page.has_link?("find out what this means", :href => "/help/beta")
+        end
+
         within 'aside nav' do
           part_titles = page.all('li').map(&:text).map(&:strip)
           assert_equal ['1. Overview', "2. What you'll get", '3. Eligibility', '4. How to claim', '5. Further information'], part_titles
@@ -53,7 +56,7 @@ class ProgrammeRenderingTest < ActionDispatch::IntegrationTest
     within('#content aside nav') { click_on "Eligibility" }
 
     assert_current_url "/reduced-earnings-allowance/eligibility"
-    
+
     within '#content .article-container' do
       within 'aside nav' do
         part_titles = page.all('li').map(&:text).map(&:strip)
@@ -134,7 +137,6 @@ class ProgrammeRenderingTest < ActionDispatch::IntegrationTest
     within '#content' do
       within 'header.page-header' do
         assert page.has_content?("Reduced Earnings Allowance")
-        assert page.has_link?("Ddim beth rydych chi’n chwilio amdano? ↓", :href => "#related")
       end
 
       within '.article-container' do
